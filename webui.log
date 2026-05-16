@@ -1,0 +1,13 @@
+正在启动 Web 服务: http://127.0.0.1:8000
+API 文档: http://127.0.0.1:8000/docs
+
+2026-05-10 11:26:07 | INFO     | src/logging_config.py:188 | 日志系统初始化完成，日志目录: logs
+2026-05-10 11:26:07 | INFO     | src/logging_config.py:189 | 常规日志: logs/web_server_20260510.log
+2026-05-10 11:26:07 | INFO     | src/logging_config.py:190 | 调试日志: logs/web_server_debug_20260510.log
+INFO:     Started server process [7208]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:45604 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48634 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48650 - "GET / HTTP/1.1" 200 OK
