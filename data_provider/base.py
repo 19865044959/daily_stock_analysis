@@ -113,6 +113,10 @@ def normalize_stock_code(stock_code: str) -> str:
         if suffix.upper() in ('SH', 'SZ', 'SS', 'BJ') and base.isdigit():
             return base
 
+    # HK stocks: bare 5-digit number -> HK prefix (e.g. 00981 -> HK00981)
+    if code.isdigit() and len(code) == 5:
+        return f"HK{code}"
+
     return code
 
 
