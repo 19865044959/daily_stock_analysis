@@ -18,7 +18,7 @@
 
 import logging
 from dataclasses import dataclass, field
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 from enum import Enum
 
 import pandas as pd
@@ -94,6 +94,8 @@ class TrendAnalysisResult:
     ma10: float = 0.0
     ma20: float = 0.0
     ma60: float = 0.0
+    ma120: Optional[float] = None
+    ma250: Optional[float] = None
     current_price: float = 0.0
     
     # 乖离率（与 MA5 的偏离度）
@@ -142,6 +144,8 @@ class TrendAnalysisResult:
             'ma10': self.ma10,
             'ma20': self.ma20,
             'ma60': self.ma60,
+            'ma120': self.ma120,
+            'ma250': self.ma250,
             'current_price': self.current_price,
             'bias_ma5': self.bias_ma5,
             'bias_ma10': self.bias_ma10,
@@ -237,6 +241,8 @@ class StockTrendAnalyzer:
         result.ma10 = float(latest['MA10'])
         result.ma20 = float(latest['MA20'])
         result.ma60 = float(latest.get('MA60', 0))
+        result.ma120 = float(latest.get('MA120')) if pd.notna(latest.get('MA120')) else None
+        result.ma250 = float(latest.get('MA250')) if pd.notna(latest.get('MA250')) else None
 
         # 1. 趋势判断
         self._analyze_trend(df, result)
@@ -271,6 +277,10 @@ class StockTrendAnalyzer:
             df['MA60'] = df['close'].rolling(window=60).mean()
         else:
             df['MA60'] = df['MA20']  # 数据不足时使用 MA20 替代
+        if len(df) >= 120:
+            df['MA120'] = df['close'].rolling(window=120).mean()
+        if len(df) >= 250:
+            df['MA250'] = df['close'].rolling(window=250).mean()
         return df
 
     def _calculate_macd(self, df: pd.DataFrame) -> pd.DataFrame:

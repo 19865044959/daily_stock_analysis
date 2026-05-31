@@ -1,0 +1,63 @@
+name: 盘中告警监控
+
+on:
+  schedule:
+    - cron: '*/20 1-7 * * 1-5'   # UTC 1:00-7:59 = 北京时间 9:00-15:59, 工作日
+  workflow_dispatch:
+
+concurrency:
+  group: alert-monitor
+  cancel-in-progress: true
+
+jobs:
+  alert-monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v5
+
+      - name: 设置 Python 环境
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: 安装依赖
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: 创建必要目录
+        run: mkdir -p data logs
+
+      - name: 恢复告警去重状态
+        uses: actions/cache/restore@v4
+        with:
+          path: data/alert_state.json
+          key: alert-state-${{ github.run_date }}
+          restore-keys: alert-state-${{ github.run_date }}
+
+      - name: 执行告警监控
+        env:
+          FEISHU_WEBHOOK_URL: ${{ secrets.FEISHU_WEBHOOK_URL }}
+          FEISHU_WEBHOOK_SECRET: ${{ secrets.FEISHU_WEBHOOK_SECRET }}
+          FEISHU_WEBHOOK_KEYWORD: ${{ secrets.FEISHU_WEBHOOK_KEYWORD }}
+          STOCK_LIST: ${{ vars.STOCK_LIST || secrets.STOCK_LIST }}
+          # 数据源配置（复用现有 secrets）
+          EFINANCE_API_KEY: ${{ secrets.EFINANCE_API_KEY }}
+          TUSHARE_TOKEN: ${{ secrets.TUSHARE_TOKEN }}
+          LONGBRIDGE_APP_KEY: ${{ secrets.LONGBRIDGE_APP_KEY }}
+          LONGBRIDGE_APP_SECRET: ${{ secrets.LONGBRIDGE_APP_SECRET }}
+          LONGBRIDGE_ACCESS_TOKEN: ${{ secrets.LONGBRIDGE_ACCESS_TOKEN }}
+          # 数据库（历史数据）
+          DB_PATH: ${{ vars.DB_PATH || secrets.DB_PATH }}
+        run: python main.py --alert-monitor
+
+      - name: 保存告警去重状态
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: data/alert_state.json
+          key: alert-state-${{ github.run_date }}-${{ github.run_id }}

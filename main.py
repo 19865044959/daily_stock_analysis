@@ -339,6 +339,12 @@ def parse_arguments() -> argparse.Namespace:
 
     # === Backtest ===
     parser.add_argument(
+        '--alert-monitor',
+        action='store_true',
+        help='盘中实时告警监控模式'
+    )
+
+    parser.add_argument(
         '--backtest',
         action='store_true',
         help='运行回测（对历史分析结果进行评估）'
@@ -834,6 +840,17 @@ def main() -> int:
                 f"回测完成: processed={stats.get('processed')} saved={stats.get('saved')} "
                 f"completed={stats.get('completed')} insufficient={stats.get('insufficient')} errors={stats.get('errors')}"
             )
+            return 0
+
+        # 模式0.5: 盘中告警监控
+        if getattr(args, 'alert_monitor', False):
+            logger.info("模式: 盘中告警监控")
+            from src.services.alert_monitor import AlertMonitorService
+
+            force_run = getattr(args, 'force_run', False)
+            service = AlertMonitorService(config, force_run=force_run)
+            triggered = service.run()
+            logger.info(f"告警监控完成，触发 {len(triggered)} 只: {triggered}")
             return 0
 
         # 模式1: 仅大盘复盘
