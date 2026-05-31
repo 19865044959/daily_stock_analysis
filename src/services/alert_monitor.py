@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 DEDUP_FILE = Path("data/alert_state.json")
 HISTORY_DAYS = 300                # 250 天均线 + 余量
-KEY_MA_PERIODS = [20, 60, 120, 250]
+KEY_MA_PERIODS = [5, 10, 20, 60, 120, 250]
 
 
 class AlertMonitorService:
@@ -115,8 +115,8 @@ class AlertMonitorService:
         """
         检查告警条件:
         1. MACD 当日死叉 (前一日 DIF > DEA 且 当日 DIF < DEA)
-        2. RSI_6 < 20
-        3. 最新价 < MA20/60/120/250 中至少一条
+        2. RSI_6 > 70（超买区）
+        3. 最新价 < MA5/10/20/60/120/250 中至少一条
         """
         if len(df) < 2:
             return []
@@ -135,8 +135,8 @@ class AlertMonitorService:
         if not death_cross:
             return []
 
-        # RSI_6 < 20
-        if trend.rsi_6 >= 20:
+        # RSI_6 > 70（超买区）
+        if trend.rsi_6 <= 70:
             return []
 
         # 跌破均线
@@ -226,7 +226,7 @@ class AlertMonitorService:
             f"⚠️ **盘中告警: {code} {name}**\n"
             f"━━━━━━━━━━━━━━━━━━\n"
             f"MACD 死叉: DIF={trend.macd_dif:.2f} DEA={trend.macd_dea:.2f}\n"
-            f"RSI(6): {trend.rsi_6:.1f} (严重超卖)\n"
+            f"RSI(6): {trend.rsi_6:.1f} (超买)\n"
             f"最新价: {price:.2f} ({change_pct:+.2f}%)\n"
             f"━━━━━━━━━━━━━━━━━━\n"
             f"跌破均线: {' '.join(f'MA{p}' for p in broken_mas)}\n"
