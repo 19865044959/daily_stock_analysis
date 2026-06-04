@@ -45,6 +45,15 @@ jobs:
           FEISHU_WEBHOOK_SECRET: ${{ secrets.FEISHU_WEBHOOK_SECRET }}
           FEISHU_WEBHOOK_KEYWORD: ${{ secrets.FEISHU_WEBHOOK_KEYWORD }}
           STOCK_LIST: ${{ vars.STOCK_LIST || secrets.STOCK_LIST }}
+          # LLM 配置
+          LLM_CHANNELS: ${{ secrets.LLM_CHANNELS }}
+          LITELLM_MODEL: ${{ secrets.LITELLM_MODEL }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          LLM_DEEPSEEK_API_KEY: ${{ secrets.LLM_DEEPSEEK_API_KEY }}
+          LLM_DEEPSEEK_BASE_URL: ${{ secrets.LLM_DEEPSEEK_BASE_URL }}
+          LLM_DEEPSEEK_MODELS: ${{ secrets.LLM_DEEPSEEK_MODELS }}
+          LLM_DEEPSEEK_ENABLED: ${{ secrets.LLM_DEEPSEEK_ENABLED }}
+          LLM_DEEPSEEK_PROTOCOL: ${{ secrets.LLM_DEEPSEEK_PROTOCOL }}
           # 数据源配置（复用现有 secrets）
           EFINANCE_API_KEY: ${{ secrets.EFINANCE_API_KEY }}
           TUSHARE_TOKEN: ${{ secrets.TUSHARE_TOKEN }}
